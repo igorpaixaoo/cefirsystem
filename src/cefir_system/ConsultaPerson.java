@@ -21,6 +21,7 @@ import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.MaskFormatter;
@@ -131,13 +132,22 @@ public class ConsultaPerson {
 		btnConsulta.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		frameConsulta.add(btnConsulta);
 		
+		JButton btnLimpar = new JButton();
+		btnLimpar.setVisible(false);
+		btnLimpar.setBounds(200, 300, 100, 30);
+		btnLimpar.setText("Limpar");
+		btnLimpar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		frameConsulta.add(btnLimpar);
+		
 		btnConsulta.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
 				try {
-					consulta(textName.getText(), textCpf.getText(), textData.getText(), textLogin, textSenha, labelDataCredenciais, labelLogin, labelSenha);
+					consulta(textName, textCpf, textData, textLogin, 
+							textSenha, labelDataCredenciais, labelLogin, 
+							labelSenha, btnLimpar, btnConsulta);
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -146,8 +156,10 @@ public class ConsultaPerson {
 		});
 	}
 	
-	public void consulta(String name, String cpf, String data, JTextField jTextLogin, JTextField jTextSenha, JLabel labelData, JLabel labelLogin, JLabel labelSenha) throws IOException {
-		File pasta = new File(RegisterPerson.DIR_DEFAULT + data + "\\" + name + " " + "-" + " " + cpf);
+	public void consulta(JTextField name, JTextField cpf, JTextField data, JTextField jTextLogin, 
+			JTextField jTextSenha, JLabel labelData, JLabel labelLogin, 
+			JLabel labelSenha, JButton buttonLimpar, JButton buttonConsulta) throws IOException {
+		File pasta = new File(RegisterPerson.DIR_DEFAULT + data.getText() + "\\" + name.getText() + " " + "-" + " " + cpf.getText());
 		if(pasta.exists()) {
 			File pastaDocumento = new File(pasta, "documentos");
 			File fileCredenciais = new File(pastaDocumento, "credenciais.txt");
@@ -188,6 +200,8 @@ public class ConsultaPerson {
             labelSenha.setVisible(true);
 			jTextLogin.setVisible(true);
 			jTextSenha.setVisible(true);
+			buttonLimpar.setVisible(true);
+			buttonConsulta.setVisible(false);
 			
 			//ultima modificação do arquivo
 			BasicFileAttributes basic = Files.readAttributes(fileCredenciais.toPath(), BasicFileAttributes.class);
@@ -203,8 +217,30 @@ public class ConsultaPerson {
 			hora1 = formatDate.format(ft.toMillis());
 			
 			labelData.setText("Ultima modificação: " + data1 + " "+ hora1);
+			
+			//botão limpar textos
+			buttonLimpar.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					name.setText("");
+					cpf.setText("");
+					data.setText("");
+					jTextLogin.setText("");
+					jTextSenha.setText("");
+					labelData.setText("");
+					
+					buttonConsulta.setVisible(true);
+					buttonLimpar.setVisible(false);
+					jTextLogin.setVisible(false);
+					jTextSenha.setVisible(false);
+		            labelLogin.setVisible(false);
+		            labelSenha.setVisible(false);
+					
+				}
+			});
 
-		}
+		}else JOptionPane.showMessageDialog(null, "Nenhum cadastro encontrado!");
 	}
 	
 }
